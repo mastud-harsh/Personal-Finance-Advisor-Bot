@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personal Finance Advisor Bot</title>
+<style>
+:root{--bg:#f3f6f9;--card:#fff;--ink:#14213d;--mute:#56647c;--line:#d6dde8;--teal:#0e7c7b;--gold:#f2a900;--bad:#c0392b;--good:#1e8a4c}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f1726;--card:#172238;--ink:#eaf0fa;--mute:#9db0cc;--line:#2a3855;--teal:#3fc1bf;--gold:#f5b72e;--bad:#ff7a6b;--good:#55d68b}}
+:root[data-theme=dark]{--bg:#0f1726;--card:#172238;--ink:#eaf0fa;--mute:#9db0cc;--line:#2a3855;--teal:#3fc1bf;--gold:#f5b72e;--bad:#ff7a6b;--good:#55d68b}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h1,h2,h3{font-family:Georgia,"Iowan Old Style",serif;line-height:1.2;margin:0 0 .5em}
+h1{font-size:clamp(2rem,6vw,3.4rem)}h2{font-size:clamp(1.5rem,4vw,2.1rem)}h3{font-size:1.1rem}
+p{margin:0 0 1em;max-width:70ch}
+a{color:var(--teal)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+nav{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);z-index:5}
+nav .wrap{display:flex;gap:18px;align-items:center;overflow-x:auto;padding-top:12px;padding-bottom:12px;white-space:nowrap}
+nav b{font-family:Georgia,serif;margin-right:auto}
+nav a{text-decoration:none;color:var(--mute);font-size:.95rem}
+nav a:hover,nav a:focus-visible{color:var(--ink)}
+section{padding:56px 0;border-bottom:1px solid var(--line)}
+.lead{font-size:1.15rem;color:var(--mute)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+/* demo */
+.demo{display:grid;gap:20px;grid-template-columns:1fr 1.1fr;margin-top:24px}
+@media(max-width:800px){.demo{grid-template-columns:1fr}}
+label{display:block;font-size:.9rem;color:var(--mute);margin-bottom:4px}
+input{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
+input:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+button{font:inherit;font-weight:600;padding:12px 18px;border-radius:6px;border:0;background:var(--teal);color:#fff;cursor:pointer}
+button.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.bar{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin:4px 0 14px}
+.bar i{display:block;height:100%;background:var(--teal)}
+.bar i.over{background:var(--bad)}
+.cat{display:flex;justify-content:space-between;font-size:.92rem}
+.tag{font-weight:600}.over-t{color:var(--bad)}.ok-t{color:var(--good)}
+.stat{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line)}
+.stat:last-child{border:0}
+ul.tips{padding-left:1.1em;margin:.4em 0 0}ul.tips li{margin-bottom:.5em}
+.note{font-size:.85rem;color:var(--mute)}
+/* flow */
+.flow{display:grid;gap:14px;grid-template-columns:1fr 1.2fr 1fr;align-items:center;margin-top:24px}
+.col{display:grid;gap:12px}
+.node{background:var(--card);border:2px solid var(--teal);border-radius:8px;padding:12px;text-align:center;font-weight:600;font-size:.95rem}
+.node small{display:block;font-weight:400;color:var(--mute)}
+.node.core{background:var(--teal);color:#fff;border-color:var(--teal)}
+.node.core small{color:#e6f6f6}
+.edge{font-size:.8rem;color:var(--mute);font-style:italic;text-align:center}
+@media(max-width:800px){.flow{grid-template-columns:1fr}}
+.steps{counter-reset:s;list-style:none;padding:0}
+.steps li{counter-increment:s;position:relative;padding:0 0 14px 44px}
+.steps li:before{content:counter(s);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--gold);color:#14213d;font-weight:700;display:grid;place-items:center}
+footer{padding:32px 0;color:var(--mute);font-size:.9rem}
+.theme{background:none;border:1px solid var(--line);color:var(--mute);padding:4px 10px;font-size:.85rem}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<nav><div class="wrap"><b>Finance Advisor Bot</b><a href="#demo">Try it</a><a href="#flow">How it works</a><a href="#features">Features</a><a href="#scenarios">Who it helps</a><a href="#tech">Technology</a><button class="theme" id="theme" type="button">Theme</button></div></nav>
+
+<header class="wrap" style="padding-top:56px;padding-bottom:24px">
+<h1>Know where your money goes, and plan where it should go next.</h1>
+<p class="lead">The Personal Finance Advisor Bot records your income and expenses, builds a budget that fits your spending, and sends you a monthly report. AI analysis turns your numbers into clear saving suggestions.</p>
+<a href="#demo"><button type="button">Build a sample budget</button></a>
+</header>
+
+<section id="demo" style="padding-top:24px">
+<div class="wrap">
+<h2>Try a budget plan</h2>
+<p>Enter one month of income and spending. The demo uses simple budgeting rules in your browser, and nothing is sent anywhere. The full project sends the same data to the Gemini API for deeper analysis.</p>
+<div class="demo">
+<form class="card" id="f" onsubmit="return false">
+<div class="row"><div><label for="inc">Monthly income</label><input id="inc" type="number" min="0" value="50000"></div>
+<div><label for="goal">Saving goal</label><input id="goal" type="number" min="0" value="10000"></div></div>
+<div class="row"><div><label for="rent">Rent</label><input id="rent" type="number" min="0" value="18000"></div>
+<div><label for="food">Food</label><input id="food" type="number" min="0" value="9000"></div></div>
+<div class="row"><div><label for="transport">Transport</label><input id="transport" type="number" min="0" value="3000"></div>
+<div><label for="fun">Entertainment</label><input id="fun" type="number" min="0" value="6000"></div></div>
+<div class="row"><div><label for="other">Other</label><input id="other" type="number" min="0" value="4000"></div><div></div></div>
+<button id="go" type="button">Generate plan</button> <button id="reset" class="alt" type="button">Reset</button>
+</form>
+<div class="card" id="out" aria-live="polite"></div>
+</div>
+</div>
+</section>
+
+<section id="flow"><div class="wrap">
+<h2>How it works</h2>
+<p>The bot is built with Flask. It receives your input, passes it to the Gemini API, and returns three results. API keys stay on the server.</p>
+<div class="flow">
+<div class="col">
+<div class="node">Flask web application<small>built with</small></div>
+<div class="node core">Personal Finance Advisor Bot</div>
+<div class="node">Secure API key management<small>ensures</small></div>
+</div>
+<div class="col">
+<div class="node">User input<small>income, expenses, financial goals</small></div>
+<div class="edge">received by the bot, then sent to</div>
+<div class="node core">Gemini API<small>generative AI</small></div>
+</div>
+<div class="col">
+<div class="node">Budget plan</div>
+<div class="node">Saving suggestions</div>
+<div class="node">Monthly summary report</div>
+</div>
+</div>
+<ol class="steps" style="margin-top:28px">
+<li><b>Record.</b> Add your monthly income and log expenses by category.</li>
+<li><b>Analyse.</b> The AI engine compares your spending against your goals.</li>
+<li><b>Plan.</b> You get a budget with a limit for each category.</li>
+<li><b>Review.</b> A monthly report shows income vs. expenses and savings achieved.</li>
+</ol>
+</div></section>
+
+<section id="features"><div class="wrap">
+<h2>Features</h2>
+<div class="grid">
+<div class="card"><h3>Income and expense tracking</h3><p>Log daily and weekly spending by category in one place.</p></div>
+<div class="card"><h3>Personalised budget plans</h3><p>Get category limits based on your income and your own spending.</p></div>
+<div class="card"><h3>Saving suggestions</h3><p>See which categories are over budget and what to cut first.</p></div>
+<div class="card"><h3>Monthly summary report</h3><p>Review income vs. expenses, savings achieved, and next month's goals.</p></div>
+<div class="card"><h3>Saving progress</h3><p>Follow how close you are to your goal each month.</p></div>
+<div class="card"><h3>Secure by design</h3><p>API keys are managed on the server and never exposed to the browser.</p></div>
+</div>
+<h3 style="margin-top:28px">Planned next</h3>
+<p>Predictive spending analytics, investment suggestions, goal-based savings tracking, and financial health monitoring.</p>
+</div></section>
+
+<section id="scenarios"><div class="wrap">
+<h2>Who it helps</h2>
+<div class="grid">
+<div class="card"><h3>Salaried professional</h3><p>Logs rent, food, transport and entertainment. Gets overspending flagged, a budget plan, and a monthly report with goals for next month.</p></div>
+<div class="card"><h3>College student</h3><p>Sets realistic limits on a small allowance and gets advice on cutting unnecessary spending.</p></div>
+<div class="card"><h3>Freelancer</h3><p>Logs income from several clients. Budgets adapt to changing income, low-saving months are highlighted, and the bot suggests ways to build an emergency fund.</p></div>
+<div class="card"><h3>Household manager</h3><p>Tracks shared income across groceries, utilities, education and healthcare, and sees where the family overspends.</p></div>
+</div>
+</div></section>
+
+<section id="tech"><div class="wrap">
+<h2>Technology</h2>
+<div class="grid">
+<div class="card"><h3>Flask</h3><p>Web framework for the backend and pages.</p></div>
+<div class="card"><h3>SQLAlchemy</h3><p>Database layer that stores income, expenses and reports.</p></div>
+<div class="card"><h3>Gemini API</h3><p>Generative AI that writes budgets, suggestions and summaries.</p></div>
+<div class="card"><h3>Key management</h3><p>Secrets kept in server-side configuration.</p></div>
+</div>
+</div></section>
+
+<footer><div class="wrap">Personal Finance Advisor Bot. The demo above gives general guidance only and is not financial advice.</div></footer>
+
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+var ids=["inc","goal","rent","food","transport","fun","other"];
+var defaults={inc:50000,goal:10000,rent:18000,food:9000,transport:3000,fun:6000,other:4000};
+// Recommended share of income per category
+var share={rent:.30,food:.15,transport:.10,fun:.05,other:.05};
+var names={rent:"Rent",food:"Food",transport:"Transport",fun:"Entertainment",other:"Other"};
+function num(id){var v=parseFloat($(id).value);return isNaN(v)||v<0?0:v}
+function fmt(n){return Math.round(n).toLocaleString("en-IN")}
+function save(){try{var o={};ids.forEach(function(i){o[i]=$(i).value});localStorage.setItem("pfab",JSON.stringify(o))}catch(e){}}
+function load(){try{var o=JSON.parse(localStorage.getItem("pfab")||"null");if(o)ids.forEach(function(i){if(o[i]!==undefined)$(i).value=o[i]})}catch(e){}}
+function run(){
+ save();
+ var inc=num("inc"),goal=num("goal"),cats=Object.keys(share),spent=0,html="",tips=[],over=[];
+ if(inc<=0){$("out").innerHTML="<p>Enter your monthly income to see a plan.</p>";return}
+ cats.forEach(function(c){spent+=num(c)});
+ var saved=inc-spent;
+ cats.forEach(function(c){
+  var a=num(c),lim=inc*share[c],pct=Math.min(100,lim?a/lim*100:100),o=a>lim;
+  if(o)over.push({c:c,by:a-lim});
+  html+='<div class="cat"><span>'+names[c]+'</span><span>'+fmt(a)+' of '+fmt(lim)+' <span class="tag '+(o?'over-t">over':'ok-t">ok')+'</span></span></div><div class="bar"><i class="'+(o?'over':'')+'" style="width:'+pct+'%"></i></div>';
+ });
+ over.sort(function(a,b){return b.by-a.by});
+ over.forEach(function(x){tips.push("Reduce "+names[x.c].toLowerCase()+" by about "+fmt(x.by)+" to reach the suggested limit.")});
+ if(saved<0)tips.unshift("You spend "+fmt(-saved)+" more than you earn. Cover this gap before anything else.");
+ else if(saved<goal)tips.push("You are "+fmt(goal-saved)+" short of your saving goal. Closing the overspend above would "+(over.reduce(function(s,x){return s+x.by},0)>=goal-saved?"reach it.":"get you closer."));
+ else tips.push("You met your saving goal. Consider moving the surplus into an emergency fund.");
+ if(!tips.length)tips.push("Your spending is within the suggested limits.");
+ var rate=saved/inc*100;
+ var out='<h3>Budget plan</h3>'+html+
+ '<h3>Monthly summary</h3>'+
+ '<div class="stat"><span>Income</span><b>'+fmt(inc)+'</b></div>'+
+ '<div class="stat"><span>Expenses</span><b>'+fmt(spent)+'</b></div>'+
+ '<div class="stat"><span>Saved</span><b class="'+(saved<0?'over-t':'ok-t')+'">'+fmt(saved)+' ('+rate.toFixed(0)+'%)</b></div>'+
+ '<div class="stat"><span>Goal</span><b>'+fmt(goal)+'</b></div>'+
+ '<h3 style="margin-top:14px">Saving suggestions</h3><ul class="tips"><li>'+tips.join('</li><li>')+'</li></ul>'+
+ '<p class="note" style="margin-top:12px">Limits follow a simple rule of thumb: rent 30%, food 15%, transport 10%, entertainment 5%, other 5% of income.</p>';
+ $("out").innerHTML=out;
+}
+$("go").onclick=run;
+$("reset").onclick=function(){ids.forEach(function(i){$(i).value=defaults[i]});run()};
+ids.forEach(function(i){$(i).addEventListener("input",run)});
+$("theme").onclick=function(){
+ var r=document.documentElement,cur=r.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");
+ r.setAttribute("data-theme",cur==="dark"?"light":"dark");
+};
+load();run();
+})();
+</script>
+</body>
+</html>
